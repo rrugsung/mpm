@@ -198,7 +198,7 @@ inline void mpm::MPMScheme<Tdim>::compute_particle_kinematics(
                 std::placeholders::_1, dt_, velocity_update));
 
   // Apply particle velocity constraints
-  mesh_->apply_particle_velocity_constraints();
+  mesh_->apply_particle_velocity_constraints(dt_*step);
 
   std::cout << "In particle Kinematics, dt: " << dt_ << ".\n";
   std::cout << "In particle Kinematics, step: " << step << ".\n";

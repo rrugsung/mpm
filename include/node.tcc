@@ -79,6 +79,7 @@ bool mpm::Node<Tdim, Tdof, Tnphases>::assign_concentrated_force(
     const std::shared_ptr<FunctionBase>& function) {
   bool status = false;
   try {
+    
     if (phase >= Tnphases || direction >= Tdim) {
       throw std::runtime_error(
           "Cannot assign nodal concentrated forcey: Direction / phase is "
