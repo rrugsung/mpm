@@ -18,6 +18,7 @@
 #include "map.h"
 #include "node_base.h"
 #include "quadrature.h"
+#include "velocity_constraint.h"
 
 namespace mpm {
 
@@ -259,7 +260,7 @@ class Cell {
   Eigen::MatrixXd dn_dx_centroid_;
   //! Velocity constraints
   //! key: face_id, value: pair of direction [0/1/2] and velocity value
-  std::map<unsigned, std::vector<std::pair<unsigned, double>>>
+  std::map<unsigned, std::vector<std::shared_ptr<mpm::VelocityConstraint>>>
       velocity_constraints_;
   //! Normal of face
   //! first-> face_id, second->vector of the normal

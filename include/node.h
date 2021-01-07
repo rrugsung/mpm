@@ -1,10 +1,12 @@
 #ifndef MPM_NODE_H_
 #define MPM_NODE_H_
 
+#include <iostream>
 #include "logger.h"
 #include "mutex.h"
 #include "nodal_properties.h"
 #include "node_base.h"
+#include "velocity_constraint.h"
 
 namespace mpm {
 
@@ -158,6 +160,7 @@ class Node : public NodeBase<Tdim> {
   }
 
   //! Compute velocity from the momentum
+  //! \param[in] step Number of step in solver
   void compute_velocity() override;
 
   //! Return velocity at a given node for a given phase
@@ -182,24 +185,21 @@ class Node : public NodeBase<Tdim> {
   //! Compute acceleration and velocity
   //! \param[in] phase Index corresponding to the phase
   //! \param[in] dt Timestep in analysis
+  //! \param[in] step Number of step in solver
   bool compute_acceleration_velocity(unsigned phase,
-                                     double dt) noexcept override;
+                                     double dt, unsigned step) noexcept override;
 
   //! Compute acceleration and velocity with cundall damping factor
   //! \param[in] phase Index corresponding to the phase
   //! \param[in] dt Timestep in analysis
   //! \param[in] damping_factor Damping factor
+  //! \param[in] step Number of step in solver
   bool compute_acceleration_velocity_cundall(
-      unsigned phase, double dt, double damping_factor) noexcept override;
-
-  //! Assign velocity constraint
-  //! Directions can take values between 0 and Dim * Nphases
-  //! \param[in] dir Direction of velocity constraint
-  //! \param[in] velocity Applied velocity constraint
-  bool assign_velocity_constraint(unsigned dir, double velocity) override;
+      unsigned phase, double dt, double damping_factor, unsigned step) noexcept override;
 
   //! Apply velocity constraints
-  void apply_velocity_constraints() override;
+  //! \param[in] current_time current time
+  void apply_velocity_constraints(int direction, int phase, double velocity) override;
 
   //! Assign friction constraint
   //! Directions can take values between 0 and Dim * Nphases
@@ -298,7 +298,7 @@ class Node : public NodeBase<Tdim> {
   //! Acceleration
   Eigen::Matrix<double, Tdim, Tnphases> acceleration_;
   //! Velocity constraints
-  std::map<unsigned, double> velocity_constraints_;
+  std::vector<std::shared_ptr<mpm::VelocityConstraint>> velocity_constraints_;
   //! Rotation matrix for general velocity constraints
   Eigen::Matrix<double, Tdim, Tdim> rotation_matrix_;
   //! Material ids whose information was passed to this node

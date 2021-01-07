@@ -8,12 +8,14 @@
 #include <set>
 #include <tuple>
 #include <vector>
+#include <iostream>
 
 #include <Eigen/Dense>
 
 #include "data_types.h"
 #include "function_base.h"
 #include "nodal_properties.h"
+#include "velocity_constraint.h"
 
 namespace mpm {
 
@@ -155,6 +157,8 @@ class NodeBase {
   virtual VectorDim momentum(unsigned phase) const = 0;
 
   //! Compute velocity from the momentum
+  //! \param[in] dt Time-step
+  //! \param[in] step Number of step in solver
   virtual void compute_velocity() = 0;
 
   //! Return velocity
@@ -173,25 +177,23 @@ class NodeBase {
   virtual VectorDim acceleration(unsigned phase) const = 0;
 
   //! Compute acceleration
+  //! \param[in] phase Index corresponding to the phase
   //! \param[in] dt Time-step
+  //! \param[in] step Number of step in solver
   virtual bool compute_acceleration_velocity(unsigned phase,
-                                             double dt) noexcept = 0;
+                                             double dt, unsigned step) noexcept = 0;
 
   //! Compute acceleration and velocity with cundall damping factor
   //! \param[in] phase Index corresponding to the phase
   //! \param[in] dt Timestep in analysis
   //! \param[in] damping_factor Damping factor
+  //! \param[in] step Number of step in solver
   virtual bool compute_acceleration_velocity_cundall(
-      unsigned phase, double dt, double damping_factor) noexcept = 0;
-
-  //! Assign velocity constraint
-  //! Directions can take values between 0 and Dim * Nphases
-  //! \param[in] dir Direction of velocity constraint
-  //! \param[in] velocity Applied velocity constraint
-  virtual bool assign_velocity_constraint(unsigned dir, double velocity) = 0;
+      unsigned phase, double dt, double damping_factor, unsigned step) noexcept = 0;
 
   //! Apply velocity constraints
-  virtual void apply_velocity_constraints() = 0;
+  //! \param[in] current_time time
+  virtual void apply_velocity_constraints(int direction, int phase, double velocity) = 0;
 
   //! Assign friction constraint
   //! Directions can take values between 0 and Dim * Nphases

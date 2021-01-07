@@ -7,6 +7,9 @@
 #include "logger.h"
 #include "mesh.h"
 #include "velocity_constraint.h"
+#include "node.h"
+#include "node_base.h"
+#include "vector.h"
 
 namespace mpm {
 
@@ -23,10 +26,16 @@ class Constraints {
   }
 
   //! Assign nodal velocity constraints
+  //! \param[in] mfunction math function
+  //! \param[in] start_time start time
+  //! \param[in] end_time end time
   //! \param[in] setid Node set id
-  //! \param[in] velocity_constraints Velocity constraint at node, dir, velocity
+  //! \param[in] dir Direction of velocity constraint
+  //! \param[in] velocity nodal velocity constraint
   bool assign_nodal_velocity_constraint(
-      int set_id, const std::shared_ptr<mpm::VelocityConstraint>& constraint);
+      const std::shared_ptr<FunctionBase>& mfunction,
+      double start_time, double end_time, int set_id,
+      unsigned dir, double velocity);
 
   //! Assign velocity constraints to nodes
   //! \param[in] velocity_constraints Constraint at node, dir, and velocity
@@ -53,6 +62,8 @@ class Constraints {
   std::shared_ptr<mpm::Mesh<Tdim>> mesh_;
   //! Logger
   std::unique_ptr<spdlog::logger> console_;
+  //! Velocity constraints
+  std::vector<std::shared_ptr<mpm::VelocityConstraint>> velocity_constraints_;
 };
 }  // namespace mpm
 

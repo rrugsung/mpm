@@ -313,6 +313,14 @@ class Mesh {
   //! Apply particles velocity constraints
   void apply_particle_velocity_constraints();
 
+  //! Create nodal velocity constraints tractions
+  //! \param[in] setid Node set id
+  bool create_nodal_velocity_constraint(
+      int set_id, const std::shared_ptr<mpm::VelocityConstraint>& constraint);
+
+  //! Apply nodal velocity constraints
+  void apply_nodal_velocity_constraints(double current_time);
+
   //! Assign nodal concentrated force
   //! \param[in] nodal_forces Force at dir on nodes
   bool assign_nodal_concentrated_forces(
@@ -519,6 +527,8 @@ class Mesh {
   //! Particle velocity constraints
   std::vector<std::shared_ptr<mpm::VelocityConstraint>>
       particle_velocity_constraints_;
+  std::vector<std::shared_ptr<mpm::VelocityConstraint>>
+      velocity_constraints_;
   //! Vector of generators for particle injections
   std::vector<mpm::Injection> particle_injections_;
   //! Nodal property pool

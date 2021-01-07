@@ -860,6 +860,15 @@ void mpm::MPMBase<Tdim>::nodal_velocity_constraints(
                 "Velocity constraints are not properly assigned");
 
         } else {
+          // Get the math function
+          std::shared_ptr<FunctionBase> vcfunction = nullptr;
+          if (constraints.find("math_function_id") != constraints.end())
+            vcfunction = math_functions_.at(
+              constraints.at("math_function_id").template get<unsigned>());
+          // Start time
+          double start_time = constraints.at("start_time").template get<double>();
+          // End time
+          double end_time = constraints.at("end_time").template get<double>();
           // Set id
           int nset_id = constraints.at("nset_id").template get<int>();
           // Direction
@@ -868,10 +877,10 @@ void mpm::MPMBase<Tdim>::nodal_velocity_constraints(
           double velocity = constraints.at("velocity").template get<double>();
           // Add velocity constraint to mesh
           auto velocity_constraint =
-              std::make_shared<mpm::VelocityConstraint>(nset_id, dir, velocity);
+              std::make_shared<mpm::VelocityConstraint>(nset_id, vcfunction, 
+                start_time, end_time, dir, velocity);
           bool velocity_constraints =
-              constraints_->assign_nodal_velocity_constraint(
-                  nset_id, velocity_constraint);
+              mesh_->create_nodal_velocity_constraint(nset_id, velocity_constraint);
           if (!velocity_constraints)
             throw std::runtime_error(
                 "Nodal velocity constraint is not properly assigned");
@@ -1031,7 +1040,15 @@ void mpm::MPMBase<Tdim>::particle_velocity_constraints(
       for (const auto& constraints :
            mesh_props["boundary_conditions"]
                      ["particles_velocity_constraints"]) {
-
+        // Get the math function
+        std::shared_ptr<FunctionBase> pvfunction = nullptr;
+        if (constraints.find("math_function_id") != constraints.end())
+        pvfunction = math_functions_.at(
+        constraints.at("math_function_id").template get<unsigned>());
+        // Start time
+        double start_time = constraints.at("start_time").template get<double>();
+        // End time
+        double end_time = constraints.at("end_time").template get<double>();
         // Set id
         int pset_id = constraints.at("pset_id").template get<int>();
         // Direction
@@ -1040,7 +1057,8 @@ void mpm::MPMBase<Tdim>::particle_velocity_constraints(
         double velocity = constraints.at("velocity").template get<double>();
         // Add velocity constraint to mesh
         auto velocity_constraint =
-            std::make_shared<mpm::VelocityConstraint>(pset_id, dir, velocity);
+              std::make_shared<mpm::VelocityConstraint>(pset_id, pvfunction, 
+                start_time, end_time, dir, velocity);
         mesh_->create_particle_velocity_constraint(pset_id,
                                                    velocity_constraint);
       }

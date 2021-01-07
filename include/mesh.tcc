@@ -1306,20 +1306,67 @@ bool mpm::Mesh<Tdim>::create_particle_velocity_constraint(
   return status;
 }
 
-//! Apply particle tractions
+//! Apply particle velocity constraints
 template <unsigned Tdim>
 void mpm::Mesh<Tdim>::apply_particle_velocity_constraints() {
   // Iterate over all particle velocity constraints
   for (const auto& pvelocity : particle_velocity_constraints_) {
     // If set id is -1, use all particles
-    int set_id = pvelocity->setid();
-    unsigned dir = pvelocity->dir();
-    double velocity = pvelocity->velocity();
+    int set_id = 0;
+    unsigned dir = 0;
+    double velocity = 0;
 
     this->iterate_over_particle_set(
         set_id,
         std::bind(&mpm::ParticleBase<Tdim>::apply_particle_velocity_constraints,
                   std::placeholders::_1, dir, velocity));
+  }
+}
+
+//! creat nodal velocity constraints
+template <unsigned Tdim>
+bool mpm::Mesh<Tdim>::create_nodal_velocity_constraint(
+      int set_id, const std::shared_ptr<mpm::VelocityConstraint>& constraint) {
+  bool status = true;
+  try {
+    velocity_constraints_.emplace_back(constraint);
+    }
+    catch (std::exception& exception) {
+    console_->error("{} #{}: {}\n", __FILE__, __LINE__, exception.what());
+    status = false;
+  }
+  return status;
+}
+
+//! Apply nodal velocity constraints
+template <unsigned Tdim>
+void mpm::Mesh<Tdim>::apply_nodal_velocity_constraints(double current_time){
+  for (const auto& constraint : velocity_constraints_) {
+    // Direction value in the constraint (0, Dim * Nphases)
+    const unsigned dir = constraint->dir();
+    // Direction: dir % Tdim (modulus)
+    const auto direction = static_cast<unsigned>(dir % Tdim);
+    // Phase: Integer value of division (dir / Tdim)
+    const auto phase = static_cast<unsigned>(dir / Tdim);
+    // Start time
+    const double start_time = constraint->start_time();
+    // End time
+    const double end_time = constraint->end_time(); 
+    // Node set id
+    const int set_id = constraint->set_id();
+    // Velocity
+    const double velocity = constraint -> velocity(current_time);
+
+    // Set id of -1, is all nodes
+    Vector<NodeBase<Tdim>> nodes =
+        (set_id == -1) ? this->nodes_ : node_sets_.at(set_id);
+    
+    //if (current_time >= start_time && current_time <= end_time){
+      #pragma omp parallel for schedule(runtime)
+      for (auto nitr = nodes.cbegin(); nitr != nodes.cend(); ++nitr) {
+        (*nitr)->apply_velocity_constraints(direction, phase, velocity);
+      }
+   // }
   }
 }
 
