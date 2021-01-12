@@ -1308,13 +1308,13 @@ bool mpm::Mesh<Tdim>::create_particle_velocity_constraint(
 
 //! Apply particle tractions
 template <unsigned Tdim>
-void mpm::Mesh<Tdim>::apply_particle_velocity_constraints() {
+void mpm::Mesh<Tdim>::apply_particle_velocity_constraints(double current_time) {
   // Iterate over all particle velocity constraints
   for (const auto& pvelocity : particle_velocity_constraints_) {
     // If set id is -1, use all particles
     int set_id = pvelocity->setid();
     unsigned dir = pvelocity->dir();
-    double velocity = pvelocity->velocity();
+    double velocity = pvelocity->velocity(current_time);
 
     this->iterate_over_particle_set(
         set_id,

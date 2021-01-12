@@ -311,7 +311,7 @@ class Mesh {
       int set_id, const std::shared_ptr<mpm::VelocityConstraint>& constraint);
 
   //! Apply particles velocity constraints
-  void apply_particle_velocity_constraints();
+  void apply_particle_velocity_constraints(double current_time);
 
   //! Assign nodal concentrated force
   //! \param[in] nodal_forces Force at dir on nodes

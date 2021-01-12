@@ -860,6 +860,11 @@ void mpm::MPMBase<Tdim>::nodal_velocity_constraints(
                 "Velocity constraints are not properly assigned");
 
         } else {
+          // Get math function
+          std::shared_ptr<FunctionBase> vcfunction = nullptr;
+          if (constraints.find("math_function_id") != constraints.end())
+            vcfunction = math_functions_.at(
+              constraints.at("math_function_id").template get<unsigned>());
           // Set id
           int nset_id = constraints.at("nset_id").template get<int>();
           // Direction
@@ -868,7 +873,7 @@ void mpm::MPMBase<Tdim>::nodal_velocity_constraints(
           double velocity = constraints.at("velocity").template get<double>();
           // Add velocity constraint to mesh
           auto velocity_constraint =
-              std::make_shared<mpm::VelocityConstraint>(nset_id, dir, velocity);
+              std::make_shared<mpm::VelocityConstraint>(nset_id, vcfunction, dir, velocity);
           bool velocity_constraints =
               constraints_->assign_nodal_velocity_constraint(
                   nset_id, velocity_constraint);
@@ -1032,6 +1037,11 @@ void mpm::MPMBase<Tdim>::particle_velocity_constraints(
            mesh_props["boundary_conditions"]
                      ["particles_velocity_constraints"]) {
 
+        // Get math function
+        std::shared_ptr<FunctionBase> pvfunction = nullptr;
+        if (constraints.find("math_function_id") != constraints.end())
+          pvfunction = math_functions_.at(
+            constraints.at("math_function_id").template get<unsigned>());
         // Set id
         int pset_id = constraints.at("pset_id").template get<int>();
         // Direction
@@ -1040,7 +1050,7 @@ void mpm::MPMBase<Tdim>::particle_velocity_constraints(
         double velocity = constraints.at("velocity").template get<double>();
         // Add velocity constraint to mesh
         auto velocity_constraint =
-            std::make_shared<mpm::VelocityConstraint>(pset_id, dir, velocity);
+            std::make_shared<mpm::VelocityConstraint>(pset_id, pvfunction, dir, velocity);
         mesh_->create_particle_velocity_constraint(pset_id,
                                                    velocity_constraint);
       }
