@@ -1323,6 +1323,17 @@ void mpm::Mesh<Tdim>::apply_particle_velocity_constraints() {
   }
 }
 
+//! Apply wall conditions to nodes
+template <unsigned Tdim>
+void mpm::Mesh<Tdim>::assign_wall_conditions(double current_time) {
+  Vector<NodeBase<Tdim>> nodes = node_sets_.at(0);
+  if(current_time <= 1.0){
+    #pragma omp parallel for schedule(runtime)
+    for (auto nitr = nodes.cbegin(); nitr != nodes.cend(); ++nitr) {
+      (*nitr)->apply_wall();
+    } 
+  }
+}
 //! Assign node tractions
 template <unsigned Tdim>
 bool mpm::Mesh<Tdim>::assign_nodal_concentrated_forces(

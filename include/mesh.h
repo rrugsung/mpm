@@ -313,6 +313,9 @@ class Mesh {
   //! Apply particles velocity constraints
   void apply_particle_velocity_constraints();
 
+  //! Assign wall boundary conditions
+  void assign_wall_conditions(double current_time);
+
   //! Assign nodal concentrated force
   //! \param[in] nodal_forces Force at dir on nodes
   bool assign_nodal_concentrated_forces(

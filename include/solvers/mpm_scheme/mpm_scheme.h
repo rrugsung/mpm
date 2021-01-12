@@ -23,7 +23,7 @@ class MPMScheme {
 
   //! Compute nodal kinematics - map mass and momentum to nodes
   //! \param[in] phase Phase to smooth pressure
-  virtual inline void compute_nodal_kinematics(unsigned phase);
+  virtual inline void compute_nodal_kinematics(unsigned phase, unsigned step);
 
   //! Compute stress and strain
   //! \param[in] phase Phase to smooth pressure
@@ -64,7 +64,7 @@ class MPMScheme {
   //! \param[in] damping_factor Value of critical damping
   virtual inline void compute_particle_kinematics(
       bool velocity_update, unsigned phase, const std::string& damping_type,
-      double damping_factor);
+      double damping_factor, unsigned step);
 
   //! Compute particle location
   //! \param[in] locate_particles Flag to enable locate particles, if set to

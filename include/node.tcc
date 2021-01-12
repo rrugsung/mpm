@@ -346,6 +346,13 @@ void mpm::Node<Tdim, Tdof, Tnphases>::apply_velocity_constraints() {
   }
 }
 
+//! Apply a wall
+template <unsigned Tdim, unsigned Tdof, unsigned Tnphases>
+void mpm::Node<Tdim, Tdof, Tnphases>::apply_wall() {
+  this->velocity_(0, 0) = 0.;
+  this->acceleration_(0, 0) = 0.;
+}
+
 //! Assign friction constraint
 //! Constrain directions can take values between 0 and Dim * Nphases
 template <unsigned Tdim, unsigned Tdof, unsigned Tnphases>

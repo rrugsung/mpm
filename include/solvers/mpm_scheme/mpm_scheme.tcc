@@ -41,7 +41,7 @@ inline void mpm::MPMScheme<Tdim>::initialise() {
 
 //! Compute nodal kinematics - map mass and momentum to nodes
 template <unsigned Tdim>
-inline void mpm::MPMScheme<Tdim>::compute_nodal_kinematics(unsigned phase) {
+inline void mpm::MPMScheme<Tdim>::compute_nodal_kinematics(unsigned phase, unsigned step) {
   // Assign mass and momentum to nodes
   mesh_->iterate_over_particles(
       std::bind(&mpm::ParticleBase<Tdim>::map_mass_momentum_to_nodes,
@@ -67,6 +67,8 @@ inline void mpm::MPMScheme<Tdim>::compute_nodal_kinematics(unsigned phase) {
   mesh_->iterate_over_nodes_predicate(
       std::bind(&mpm::NodeBase<Tdim>::compute_velocity, std::placeholders::_1),
       std::bind(&mpm::NodeBase<Tdim>::status, std::placeholders::_1));
+
+  mesh_->assign_wall_conditions(dt_*step);
 }
 
 //! Initialize nodes, cells and shape functions
@@ -172,7 +174,7 @@ inline void mpm::MPMScheme<Tdim>::compute_forces(
 template <unsigned Tdim>
 inline void mpm::MPMScheme<Tdim>::compute_particle_kinematics(
     bool velocity_update, unsigned phase, const std::string& damping_type,
-    double damping_factor) {
+    double damping_factor, unsigned step) {
 
   // Check if damping has been specified and accordingly Iterate over
   // active nodes to compute acceleratation and velocity
@@ -186,6 +188,9 @@ inline void mpm::MPMScheme<Tdim>::compute_particle_kinematics(
         std::bind(&mpm::NodeBase<Tdim>::compute_acceleration_velocity,
                   std::placeholders::_1, phase, dt_),
         std::bind(&mpm::NodeBase<Tdim>::status, std::placeholders::_1));
+
+  // Apply walls
+  mesh_->assign_wall_conditions(dt_*step);
 
   // Iterate over each particle to compute updated position
   mesh_->iterate_over_particles(

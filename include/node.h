@@ -201,6 +201,9 @@ class Node : public NodeBase<Tdim> {
   //! Apply velocity constraints
   void apply_velocity_constraints() override;
 
+  //! Apply a wall
+  void apply_wall() override;
+
   //! Assign friction constraint
   //! Directions can take values between 0 and Dim * Nphases
   //! \param[in] dir Direction of friction constraint
