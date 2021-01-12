@@ -33,17 +33,18 @@ class VelocityConstraint {
 
   // Return velocity
   double velocity(double current_time) const {
+    // Constant velocity when no math function is defined
     double scalar = (this->constraint_fn_ != nullptr)
-                      ? (this->constraint_fn_)->value(current_time)
-                      : 1.0;
-    return velocity_* scalar;
+                        ? (this->constraint_fn_)->value(current_time)
+                        : 1.0;
+    return velocity_*scalar;
   }
 
  private:
   // ID
   int setid_;
   // Math Function
-  const std::shared_ptr<FunctionBase>& constraint_fn_;
+  std::shared_ptr<mpm::FunctionBase> constraint_fn_;
   // Direction
   unsigned dir_;
   // Velocity
