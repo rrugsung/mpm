@@ -52,7 +52,7 @@ class VelocityConstraint {
   // Set id
   int set_id_;
   // Math Function
-  const std::shared_ptr<FunctionBase>& constraint_fn_;
+  std::shared_ptr<mpm::FunctionBase> constraint_fn_;
   // Start Time
   double start_time_;
   // End Time

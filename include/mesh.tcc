@@ -1364,12 +1364,12 @@ void mpm::Mesh<Tdim>::apply_nodal_velocity_constraints(double current_time){
     Vector<NodeBase<Tdim>> nodes =
         (set_id == -1) ? this->nodes_ : node_sets_.at(set_id);
     
-    //if (current_time >= start_time && current_time <= end_time){
+    if (current_time >= start_time && current_time <= end_time){
       #pragma omp parallel for schedule(runtime)
       for (auto nitr = nodes.cbegin(); nitr != nodes.cend(); ++nitr) {
         (*nitr)->apply_velocity_constraints(direction, phase, velocity);
       }
-   // }
+    }
   }
 }
 
